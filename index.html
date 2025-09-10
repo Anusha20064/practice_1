@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mobile Phone Shop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #1a73e8;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.07);
+        }
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+        }
+        .products {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+        .product-card {
+            background: #fafbfc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            width: 250px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: box-shadow 0.2s;
+        }
+        .product-card:hover {
+            box-shadow: 0 4px 10px rgba(26,115,232,0.13);
+        }
+        .product-card img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+        }
+        .product-card h3 {
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+        }
+        .price {
+            font-weight: bold;
+            color: #1a73e8;
+            margin-bottom: 1rem;
+        }
+        .add-cart-btn {
+            background: #1a73e8;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+        }
+        .add-cart-btn:hover {
+            background: #1761ca;
+        }
+        .cart {
+            margin-top: 2rem;
+        }
+        .cart h2 {
+            margin-bottom: 1rem;
+        }
+        .cart-list {
+            list-style: none;
+            padding: 0;
+        }
+        .cart-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .checkout-btn {
+            background: #34a853;
+            color: #fff;
+            border: none;
+            margin-top: 1rem;
+            padding: 0.7rem 1.5rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .checkout-btn:hover {
+            background: #2e8c46;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Mobile Phone Shop</h1>
+        <p>Find and buy your favorite mobile phones!</p>
+    </header>
+    <div class="container">
+        <section class="products" id="products">
+            <!-- Product cards will be rendered here -->
+        </section>
+
+        <section class="cart" id="cart-section" style="display:none;">
+            <h2>Your Cart</h2>
+            <ul class="cart-list" id="cart-list"></ul>
+            <p id="cart-total"></p>
+            <button class="checkout-btn" onclick="checkout()">Checkout</button>
+        </section>
+    </div>
+    <script>
+        const products = [
+            {
+                id: 1,
+                name: "iPhone 15 Pro",
+                price: 1199,
+                img: "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-model-unselect-gallery-1-202309?wid=512&hei=512&fmt=jpeg&qlt=95&.v=1693507770547",
+                desc: "Apple A17 Pro, 6.1-inch Super Retina XDR display, 128GB"
+            },
+            {
+                id: 2,
+                name: "Samsung Galaxy S24 Ultra",
+                price: 999,
+                img: "https://images.samsung.com/is/image/samsung/p6pim/levant/sm-s928bztgmea/gallery/levant-galaxy-s24-ultra-sm-s928-494131-sm-s928bztgmea-538802383",
+                desc: "Snapdragon 8 Gen 3, 6.8-inch QHD+, 256GB"
+            },
+            {
+                id: 3,
+                name: "OnePlus 12",
+                price: 799,
+                img: "https://image01.oneplus.net/ebp/202312/27/1-m00-1d-47-rb8bwmw5bwuabnjlaae22w8f6m8415.png",
+                desc: "Snapdragon 8 Gen 3, 6.82-inch AMOLED, 256GB"
+            },
+            {
+                id: 4,
+                name: "Google Pixel 8 Pro",
+                price: 899,
+                img: "https://store.google.com/product/images/phone/pixel_8_pro_cobalt_front_back.png",
+                desc: "Google Tensor G3, 6.7-inch LTPO OLED, 128GB"
+            }
+        ];
+
+        let cart = [];
+
+        function renderProducts() {
+            const productsDiv = document.getElementById('products');
+            productsDiv.innerHTML = '';
+            products.forEach(p => {
+                productsDiv.innerHTML += `
+                    <div class="product-card">
+                        <img src="${p.img}" alt="${p.name}">
+                        <h3>${p.name}</h3>
+                        <div class="price">$${p.price}</div>
+                        <p>${p.desc}</p>
+                        <button class="add-cart-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+                    </div>
+                `;
+            });
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const cartItem = cart.find(item => item.id === productId);
+            if (cartItem) {
+                cartItem.qty += 1;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const cartSection = document.getElementById('cart-section');
+            const cartList = document.getElementById('cart-list');
+            const cartTotal = document.getElementById('cart-total');
+            if (cart.length === 0) {
+                cartSection.style.display = "none";
+                return;
+            }
+            cartSection.style.display = "block";
+            cartList.innerHTML = '';
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price * item.qty;
+                cartList.innerHTML += `
+                    <li>
+                        <span>${item.name} x${item.qty}</span>
+                        <span>$${item.price * item.qty}</span>
+                        <button onclick="removeFromCart(${item.id})" style="background:#e53935;color:#fff;border:none;padding:0.3rem 0.7rem;border-radius:3px;cursor:pointer;">Remove</button>
+                    </li>
+                `;
+            });
+            cartTotal.innerText = `Total: $${total}`;
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            renderCart();
+        }
+
+        function checkout() {
+            alert("Checkout successful! Thank you for shopping.");
+            cart = [];
+            renderCart();
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>
